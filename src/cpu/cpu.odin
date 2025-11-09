@@ -245,22 +245,22 @@ decode :: proc(
                     ctx.reg_I += u16(ctx.registers[x])
                     break
                 case 0x29:                  // 0xFX29 Sets I to font address for character X (lowest nibble)
-                    char := x & 0x0F
-                    ctx.reg_I = memory.FONT_START + 5*char
+                    char := ctx.registers[x] & 0x0F
+                    ctx.reg_I = memory.FONT_START + 5*u16(char)
                     break
                 case 0x33:                  // 0xFX33 Stores binary-coded decimal of Vx
                     bcd_h := u8(ctx.registers[x] / 100)
                     memory.put(ctx_mem, bcd_h, int(ctx.reg_I))
-                    bcd_t := u8(ctx.registers[x] / 10)
+                    bcd_t := u8((ctx.registers[x] / 10) % 10)
                     memory.put(ctx_mem, bcd_t, int(ctx.reg_I + 1))
                     bcd_o := u8(ctx.registers[x] % 10)
                     memory.put(ctx_mem, bcd_o, int(ctx.reg_I + 2))
                     break
                 case 0x55:                  // 0xFX55 Dumps V0..Vx into memory starting at I
-                    memory.cpy_put(ctx_mem, ctx.registers, int(x), ctx.reg_I)
+                    memory.cpy_put(ctx_mem, ctx.registers, int(x) + 1, ctx.reg_I)
                     break
                 case 0x65:                  // 0xFX65 Loads into V0..Vx starting from I
-                    memory.cpy_get(ctx_mem, ctx.registers, int(x), ctx.reg_I)
+                    memory.cpy_get(ctx_mem, ctx.registers, int(x) + 1, ctx.reg_I)
                     break
             }
             break

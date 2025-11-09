@@ -60,6 +60,10 @@ main :: proc() {
         rl.DrawTexturePro(tex, {0,0,64,32}, {0,0,64*SCALE,32*SCALE}, {0,0}, 0, rl.WHITE)
 
         rl.EndDrawing()
+
+        if rl.IsKeyPressed(.K) {
+            rl.TakeScreenshot("out.png")
+        }
     }
 }
 

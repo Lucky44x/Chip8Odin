@@ -2,3 +2,5 @@
 build/
 roms/
 *.exe
+*.png
+*.ch8

@@ -138,7 +138,7 @@ cpy_put :: proc(
     offset: u16 = 0
 ) {
     dst := mem.ptr_offset(ctx.ram, offset)
-    _ = mem.copy(val, dst, len)
+    _ = mem.copy(dst, val, len)
 }
 
 cpy_get :: proc(
