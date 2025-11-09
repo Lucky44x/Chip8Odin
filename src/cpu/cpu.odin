@@ -156,30 +156,32 @@ decode :: proc(
                     ctx.registers[x] ~= ctx.registers[y]
                     break
                 case 0x4:                       // 0x8XY4 Add Vy to Vx
-                    val := cast(u16)ctx.registers[x] + cast(u16)ctx.registers[y]
-                    if val > 256 { ctx.registers[0xF] = 1 } // Set overflow
-                    else { ctx.registers[0xF] = 0 }
+                    val := u16(ctx.registers[x]) + u16(ctx.registers[y])
                     ctx.registers[x] += ctx.registers[y]
+                    if val > 255 { ctx.registers[0xF] = 1 } // Set overflow
+                    else { ctx.registers[0xF] = 0 }
                     break
                 case 0x5:                       // 0x8XY5 Subtract Vy from Vx
-                    if ctx.registers[x] >= ctx.registers[y] { ctx.registers[0xF] = 1 } // Set underflow
-                    else { ctx.registers[0xF] = 0 }
+                    valX,valY := ctx.registers[x], ctx.registers[y]
                     ctx.registers[x] -= ctx.registers[y]
+                    if valX >= valY { ctx.registers[0xF] = 1 } // Set underflow
+                    else { ctx.registers[0xF] = 0 }
                     break
                 case 0x6:                       // 0x8XY6 Bitwise Rightshift and Vf = least significatn bit before shift
                     old := ctx.registers[x]
-                    ctx.registers[0xF] = old & 0x01
                     ctx.registers[x] = old >> 1
+                    ctx.registers[0xF] = old & 0x01
                     break
                 case 0x7:                       // 0x8XY7 Vx = Vy - Vx
-                    if ctx.registers[y] >= ctx.registers[x] { ctx.registers[0xF] = 1 } // Set underflow
-                    else { ctx.registers[0xF] = 0 }
+                    valX,valY := ctx.registers[x], ctx.registers[y]
                     ctx.registers[x] = ctx.registers[y] - ctx.registers[x]
+                    if valY >= valX { ctx.registers[0xF] = 1 } // Set underflow
+                    else { ctx.registers[0xF] = 0 }
                     break
                 case 0xE:                       // 0x8XYE  Bitwise leftshift and Vf = most significatn bit before shift
                     old := ctx.registers[x];
-                    ctx.registers[0xF] = (old >> 7) & 0x01;
                     ctx.registers[x] = old << 1;
+                    ctx.registers[0xF] = (old >> 7) & 0x01;
                     break
             }
             break
@@ -197,7 +199,7 @@ decode :: proc(
             ctx.registers[x] = r & u8(nn)
             break
         case 0xD:                           // 0xDXYN Draws sprite at coordinate VX, VY that has a width of 8 pixels and a height of N from the I register
-            ctx.registers[0xF] = 0
+            //ctx.registers[0xF] = 0
             sX := ctx.registers[x] % 64
             sY := ctx.registers[y] % 32
             for sprY in 0..<u8(n) {
