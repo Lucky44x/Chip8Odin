@@ -148,12 +148,15 @@ decode :: proc(
                     break
                 case 0x1:                       // 0x8XY1 Set Vx bitwise or Vy
                     ctx.registers[x] |= ctx.registers[y]
+                    ctx.registers[0xF] = 0      // QUIRK: Reset VF
                     break
                 case 0x2:                       // 0x8XY2 Set Vx bitwise and Vy
                     ctx.registers[x] &= ctx.registers[y]
+                    ctx.registers[0xF] = 0      // QUIRK: Reset VF
                     break
                 case 0x3:                       // 0x8XY3 Set Vx bitwise or Vy
                     ctx.registers[x] ~= ctx.registers[y]
+                    ctx.registers[0xF] = 0      // QUIRK: Reset VF
                     break
                 case 0x4:                       // 0x8XY4 Add Vy to Vx
                     val := u16(ctx.registers[x]) + u16(ctx.registers[y])
@@ -260,9 +263,11 @@ decode :: proc(
                     break
                 case 0x55:                  // 0xFX55 Dumps V0..Vx into memory starting at I
                     memory.cpy_put(ctx_mem, ctx.registers, int(x) + 1, ctx.reg_I)
+                    ctx.reg_I += u16(x) + 1  // QUIRK: Increment Index register
                     break
                 case 0x65:                  // 0xFX65 Loads into V0..Vx starting from I
                     memory.cpy_get(ctx_mem, ctx.registers, int(x) + 1, ctx.reg_I)
+                    ctx.reg_I += u16(x) + 1   // QUIRK: Increment Index register
                     break
             }
             break
